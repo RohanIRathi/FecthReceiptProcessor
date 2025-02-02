@@ -15,8 +15,6 @@ COPY /vendor/. ./vendor/
 RUN mkdir build
 RUN go build -o ./build/receiptprocessor
 
-RUN go test
-
 RUN echo "#!/bin/bash" > build.sh
 RUN echo "goose --dir sql/schema postgres postgres://postgres:postgres@postgres:5432/receiptprocessor up" >> build.sh
 RUN echo "./build/receiptprocessor" >> build.sh

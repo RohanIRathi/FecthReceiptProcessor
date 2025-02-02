@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,11 +11,15 @@ import (
 var Points_channel = make(chan int)
 
 func (apiCfg *ApiConfig) handleGetPoints(w http.ResponseWriter, r *http.Request) {
-	receipt_id := uuid.MustParse(r.PathValue("id"))
+	receipt_id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		respondWithJSON(w, 404, fmt.Sprintf("Receipt not found: %v", err))
+		return
+	}
 
 	receipt, err := apiCfg.DB.GetReceipt(r.Context(), receipt_id)
 	if err != nil {
-		respondWithJSON(w, 400, err)
+		respondWithJSON(w, 404, err)
 		return
 	}
 

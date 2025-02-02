@@ -22,3 +22,7 @@ The defaul for these values are:
 >
 > 1. The DB_URL variable can be constructed as: `postgres://{Username}:{Password}@{Host}:{Port}/{DatabaseName}?sslmode=disable`
 > 1. The Application requires Golang version >=1.23.3 and Postgres version >=15.2
+
+```
+Test cases can be run using the run_tests.bat or run_tests.sh scripts outside docker container shells.
+```

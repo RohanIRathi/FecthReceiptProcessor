@@ -46,7 +46,7 @@ func (apiCfg *ApiConfig) handleCreateReceipt(w http.ResponseWriter, r *http.Requ
 	})
 	if err != nil {
 		log.Printf("Internal Error adding receipt: %v", err)
-		respondWithJSON(w, 500, "Error adding Receipt!")
+		respondWithJSON(w, 400, "Error adding Receipt!")
 		return
 	}
 	receipt_id := receipt.ID
@@ -59,7 +59,7 @@ func (apiCfg *ApiConfig) handleCreateReceipt(w http.ResponseWriter, r *http.Requ
 		})
 		if err != nil {
 			log.Printf("Error adding items: %v", err)
-			respondWithJSON(w, 500, "Error adding items")
+			respondWithJSON(w, 400, "Error adding items")
 			return
 		}
 	}
