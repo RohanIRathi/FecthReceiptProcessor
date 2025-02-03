@@ -4,7 +4,7 @@ This is the my implementation of the take home exam assigned by Fetch to create 
 
 ## Running application using Docker
 
-I have already dockerized the application with Golang and Postgres services. To run the application, simply run `docker-compose up` and the application will start on port 8000.
+I have already dockerized the application with Golang base image. To run the application, simply run `docker build . -t ${IMAGE_NAME}` followed by `docker container run --name ${CONTAINER_NAME} ${IMAGE_NAME}` and the application will start on port 8000.
 
 ## Running the Go app directly
 
