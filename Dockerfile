@@ -2,23 +2,27 @@ FROM golang:1.23.3
 
 WORKDIR /app
 
+# Go installations
 RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY *.go ./
 COPY /database_util/. ./database_util/
 COPY /sql/. ./sql/
 COPY /vendor/. ./vendor/
+COPY *.go ./
+RUN go env -w CGO_ENABLED=1
 
+# Running test cases
+RUN goose --dir sql/schema sqlite3 ./db-test.sqlite3 up
+RUN go test
+RUN rm -rf ./db-test.sqlite3
+
+# Creating the build
 RUN mkdir build
 RUN go build -o ./build/receiptprocessor
 
-RUN echo "#!/bin/bash" > build.sh
-RUN echo "goose --dir sql/schema postgres postgres://postgres:postgres@postgres:5432/receiptprocessor up" >> build.sh
-RUN echo "./build/receiptprocessor" >> build.sh
+RUN goose --dir sql/schema sqlite3 ./db.sqlite3 up
 
-RUN chmod 777 ./build.sh
-
-CMD ["./build.sh"]
+CMD ["./build/receiptprocessor"]

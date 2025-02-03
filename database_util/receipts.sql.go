@@ -8,24 +8,20 @@ package database_util
 import (
 	"context"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const createReceipt = `-- name: CreateReceipt :one
-
-INSERT INTO receipts
-    (id, retailer, purchase_datetime, total)
+INSERT INTO
+    receipts (id, retailer, purchase_datetime, total)
 VALUES
-    ($1, $2, $3, $4)
-RETURNING id, retailer, purchase_datetime, total
+    (?, ?, ?, ?) RETURNING id, retailer, purchase_datetime, total
 `
 
 type CreateReceiptParams struct {
-	ID               uuid.UUID
+	ID               string
 	Retailer         string
 	PurchaseDatetime time.Time
-	Total            string
+	Total            float64
 }
 
 func (q *Queries) CreateReceipt(ctx context.Context, arg CreateReceiptParams) (Receipt, error) {
@@ -46,10 +42,17 @@ func (q *Queries) CreateReceipt(ctx context.Context, arg CreateReceiptParams) (R
 }
 
 const getReceipt = `-- name: GetReceipt :one
-SELECT id, retailer, purchase_datetime, total FROM receipts where id=$1 LIMIT 1
+SELECT
+    id, retailer, purchase_datetime, total
+FROM
+    receipts
+WHERE
+    id = ?
+LIMIT
+    1
 `
 
-func (q *Queries) GetReceipt(ctx context.Context, id uuid.UUID) (Receipt, error) {
+func (q *Queries) GetReceipt(ctx context.Context, id string) (Receipt, error) {
 	row := q.db.QueryRowContext(ctx, getReceipt, id)
 	var i Receipt
 	err := row.Scan(

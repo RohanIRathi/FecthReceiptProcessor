@@ -18,27 +18,27 @@ func TestHandlerGetPoints(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/receipts/e1ce4eb1-a248-4b18-8e66-efc4606b9447/points", nil)
 	w := httptest.NewRecorder()
-	id1 := uuid.MustParse("e1ce4eb1-a248-4b18-8e66-efc4606b9447")
+	id1 := "e1ce4eb1-a248-4b18-8e66-efc4606b9447"
 	receipt1 := database_util.CreateReceiptParams{
 		ID:               id1,
 		Retailer:         "Target",
 		PurchaseDatetime: time.Date(2022, 1, 1, 13, 1, 0, 0, time.UTC),
-		Total:            "35.35",
+		Total:            35.35,
 	}
 	apiCfg.DB.CreateReceipt(req.Context(), receipt1)
 
 	items1 := []database_util.AddItemParams{
-		{ID: uuid.New(), Description: "Mountain Dew 12PK", Price: "6.49", Receipt: id1},
-		{ID: uuid.New(), Description: "Emils Cheese Pizza", Price: "12.25", Receipt: id1},
-		{ID: uuid.New(), Description: "Knorr Creamy Chicken", Price: "1.26", Receipt: id1},
-		{ID: uuid.New(), Description: "Doritos Nacho Cheese", Price: "3.35", Receipt: id1},
-		{ID: uuid.New(), Description: "   Klarbrunn 12-PK 12 FL OZ  ", Price: "12.00", Receipt: id1},
+		{ID: uuid.New().String(), Description: "Mountain Dew 12PK", Price: 6.49, Receipt: id1},
+		{ID: uuid.New().String(), Description: "Emils Cheese Pizza", Price: 12.25, Receipt: id1},
+		{ID: uuid.New().String(), Description: "Knorr Creamy Chicken", Price: 1.26, Receipt: id1},
+		{ID: uuid.New().String(), Description: "Doritos Nacho Cheese", Price: 3.35, Receipt: id1},
+		{ID: uuid.New().String(), Description: "   Klarbrunn 12-PK 12 FL OZ  ", Price: 12.00, Receipt: id1},
 	}
 	for _, item := range items1 {
 		apiCfg.DB.AddItem(req.Context(), item)
 	}
 
-	req.SetPathValue("id", id1.String())
+	req.SetPathValue("id", id1)
 	apiCfg.handleGetPoints(w, req)
 
 	res := w.Result()
@@ -58,25 +58,25 @@ func TestHandlerGetPoints(t *testing.T) {
 	req = httptest.NewRequest(http.MethodGet, "/receipts/90e3ad56-b8ff-48aa-a4d5-8dd3654110f4/points", nil)
 	w = httptest.NewRecorder()
 
-	id2 := uuid.MustParse("90e3ad56-b8ff-48aa-a4d5-8dd3654110f4")
+	id2 := "90e3ad56-b8ff-48aa-a4d5-8dd3654110f4"
 	receipt2 := database_util.CreateReceiptParams{
 		ID:               id2,
 		Retailer:         "M&M Corner Market",
 		PurchaseDatetime: time.Date(2022, 3, 20, 14, 33, 0, 0, time.UTC),
-		Total:            "9.00",
+		Total:            9.00,
 	}
 	apiCfg.DB.CreateReceipt(req.Context(), receipt2)
 	items2 := []database_util.AddItemParams{
-		{ID: uuid.New(), Description: "Gatorade", Price: "2.25", Receipt: id2},
-		{ID: uuid.New(), Description: "Gatorade", Price: "2.25", Receipt: id2},
-		{ID: uuid.New(), Description: "Gatorade", Price: "2.25", Receipt: id2},
-		{ID: uuid.New(), Description: "Gatorade", Price: "2.25", Receipt: id2},
+		{ID: uuid.New().String(), Description: "Gatorade", Price: 2.25, Receipt: id2},
+		{ID: uuid.New().String(), Description: "Gatorade", Price: 2.25, Receipt: id2},
+		{ID: uuid.New().String(), Description: "Gatorade", Price: 2.25, Receipt: id2},
+		{ID: uuid.New().String(), Description: "Gatorade", Price: 2.25, Receipt: id2},
 	}
 	for _, item := range items2 {
 		apiCfg.DB.AddItem(req.Context(), item)
 	}
 
-	req.SetPathValue("id", id2.String())
+	req.SetPathValue("id", id2)
 	apiCfg.handleGetPoints(w, req)
 
 	res = w.Result()

@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -36,9 +36,9 @@ func calculateRetailerNamePoints(retailer string) {
 	Points_channel <- count
 }
 
-func calculateTotalValuePoints(total float32) {
+func calculateTotalValuePoints(total float64) {
 	count := 0
-	if float32(int(total)) == total {
+	if float64(int(total)) == total {
 		count += 50
 	}
 	if int(total*100)%25 == 0 {
@@ -72,12 +72,7 @@ func calculateItemPoints(items []database_util.Item) {
 
 	for _, item := range items {
 		if len(strings.Trim(item.Description, " "))%3 == 0 {
-			price, err := strconv.ParseFloat(item.Price, 32)
-			if err != nil {
-				Points_channel <- count
-				return
-			}
-			count += int(price*0.2) + 1
+			count += int(math.Ceil(item.Price * 0.2))
 		}
 	}
 

@@ -9,7 +9,7 @@ import (
 	database "github.com/RohanIRathi/ReceiptProcessor/database_util"
 	"github.com/joho/godotenv"
 
-	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type ApiConfig struct {
@@ -28,10 +28,10 @@ func main() {
 	dbUrl := os.Getenv("DB_URL")
 	if dbUrl == "" {
 		log.Println("DB_URL is not setup in the environment. Trying default connection string")
-		dbUrl = "postgres://postgres:postgres@postgres:5432/receiptprocessor?sslmode=disable"
+		dbUrl = "./db.sqlite3"
 	}
 
-	conn, err := sql.Open("postgres", dbUrl)
+	conn, err := sql.Open("sqlite3", dbUrl)
 
 	if err != nil {
 		log.Fatalf("Cannot connect to the database! Error: %v", err)
@@ -48,7 +48,7 @@ func main() {
 	handler.HandleFunc("GET /receipts/{id}/points", apiCfg.handleGetPoints)
 
 	router := &http.Server{
-		Addr:    "0.0.0.0:" + portString,
+		Addr:    ":" + portString,
 		Handler: handler,
 	}
 	log.Printf("Server running at %v", router.Addr)

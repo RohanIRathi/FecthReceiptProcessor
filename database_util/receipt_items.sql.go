@@ -7,20 +7,20 @@ package database_util
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 const addItem = `-- name: AddItem :one
-
-INSERT INTO items (id, description, price, receipt) VALUES ($1, $2, $3, $4) RETURNING id, description, price, receipt
+INSERT INTO
+    items (id, description, price, receipt)
+VALUES
+    (?, ?, ?, ?) RETURNING id, description, price, receipt
 `
 
 type AddItemParams struct {
-	ID          uuid.UUID
+	ID          string
 	Description string
-	Price       string
-	Receipt     uuid.UUID
+	Price       float64
+	Receipt     string
 }
 
 func (q *Queries) AddItem(ctx context.Context, arg AddItemParams) (Item, error) {
@@ -41,10 +41,15 @@ func (q *Queries) AddItem(ctx context.Context, arg AddItemParams) (Item, error) 
 }
 
 const getReceiptItems = `-- name: GetReceiptItems :many
-SELECT id, description, price, receipt FROM items WHERE receipt=$1
+SELECT
+    id, description, price, receipt
+FROM
+    items
+WHERE
+    receipt = ?
 `
 
-func (q *Queries) GetReceiptItems(ctx context.Context, receipt uuid.UUID) ([]Item, error) {
+func (q *Queries) GetReceiptItems(ctx context.Context, receipt string) ([]Item, error) {
 	rows, err := q.db.QueryContext(ctx, getReceiptItems, receipt)
 	if err != nil {
 		return nil, err

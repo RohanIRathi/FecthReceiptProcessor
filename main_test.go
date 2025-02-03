@@ -12,7 +12,7 @@ import (
 	"github.com/RohanIRathi/ReceiptProcessor/database_util"
 	"github.com/joho/godotenv"
 
-	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var apiCfg ApiConfig
@@ -21,17 +21,17 @@ func TestMain(m *testing.M) {
 	godotenv.Load()
 	test_db_url := os.Getenv("TEST_DB_URL")
 	if test_db_url == "" {
-		test_db_url = "postgres://postgres:postgres@localhost:5432/app_test?sslmode=disable"
+		test_db_url = "./db-test.sqlite3"
 	}
 
-	db, err := sql.Open("postgres", test_db_url)
+	db, err := sql.Open("sqlite3", test_db_url)
 	if err != nil {
-		log.Fatalf("Database connection failed! Abort tests!")
+		log.Fatalf("Database connection failed! Abort tests! Error: %v", err)
 		os.Exit(1)
 	}
 	err = db.Ping()
 	if err != nil {
-		log.Fatalf("Database connection failed! Abort tests!")
+		log.Fatalf("Database connection failed! Abort tests! Error: %v", err)
 		os.Exit(1)
 	}
 

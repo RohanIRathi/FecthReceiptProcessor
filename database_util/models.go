@@ -6,20 +6,18 @@ package database_util
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Item struct {
-	ID          uuid.UUID
+	ID          string
 	Description string
-	Price       string
-	Receipt     uuid.UUID
+	Price       float64
+	Receipt     string
 }
 
 type Receipt struct {
-	ID               uuid.UUID
+	ID               string
 	Retailer         string
 	PurchaseDatetime time.Time
-	Total            string
+	Total            float64
 }

@@ -2,40 +2,37 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"strconv"
-
-	"github.com/google/uuid"
 )
 
 var Points_channel = make(chan int)
 
 func (apiCfg *ApiConfig) handleGetPoints(w http.ResponseWriter, r *http.Request) {
-	receipt_id, err := uuid.Parse(r.PathValue("id"))
-	if err != nil {
-		respondWithJSON(w, 404, fmt.Sprintf("Receipt not found: %v", err))
+	receipt_id := r.PathValue("id")
+	if receipt_id == "" {
+		log.Printf("%v %v - %v: id not provided", r.Method, r.URL, http.StatusNotFound)
+		respondWithJSON(w, http.StatusNotFound, fmt.Sprintf("Receipt not found: id not found"))
 		return
 	}
 
 	receipt, err := apiCfg.DB.GetReceipt(r.Context(), receipt_id)
 	if err != nil {
-		respondWithJSON(w, 404, err)
+		log.Printf("%v %v - %v: %v", r.Method, r.URL, http.StatusNotFound, err)
+		respondWithJSON(w, http.StatusNotFound, fmt.Sprintf("Recipt not found: %v", err))
 		return
 	}
 
 	go calculateRetailerNamePoints(receipt.Retailer)
-	total, err := strconv.ParseFloat(receipt.Total, 32)
-	if err != nil {
-		respondWithJSON(w, 500, "Internal Server Error")
-		return
-	}
-	go calculateTotalValuePoints(float32(total))
+	total := receipt.Total
+	go calculateTotalValuePoints(total)
 
 	go calculateDateTimePoints(receipt.PurchaseDatetime)
 
 	items, err := apiCfg.DB.GetReceiptItems(r.Context(), receipt_id)
 	if err != nil {
-		respondWithJSON(w, 500, "Internal Server Error")
+		log.Printf("%v %v - %v: %v", r.Method, r.URL, http.StatusInternalServerError, err)
+		respondWithJSON(w, http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
 	go calculateItemPoints(items)
@@ -51,4 +48,5 @@ func (apiCfg *ApiConfig) handleGetPoints(w http.ResponseWriter, r *http.Request)
 	}
 
 	respondWithJSON(w, 200, Reward{Points: count})
+	log.Printf("%v %v - %v", r.Method, r.URL, http.StatusOK)
 }
